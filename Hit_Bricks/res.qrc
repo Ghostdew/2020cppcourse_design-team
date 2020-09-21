@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/background.jpg</file>
+        <file>image/pause.png</file>
+        <file>image/restart.png</file>
+        <file>image/startbutton.png</file>
+        <file>image/startbutton2.png</file>
+        <file>image/windowicon.jpg</file>
+        <file>image/exit.png</file>
+        <file>image/title.jpg</file>
+        <file>image/exit2.png</file>
+        <file>image/BackButton.png</file>
+        <file>image/BackButtonSelected.png</file>
+        <file>image/levelbutton.png</file>
+        <file>image/one.png</file>
+    </qresource>
+</RCC>
