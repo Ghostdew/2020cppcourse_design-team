@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->StartButton,&QToolButton::released,this,[=](){
         ui->StartButton->setStyleSheet("border-image: url(:/image/startbutton.png);");//开始按钮按下效果实现
-        QTimer::singleShot(500,this,[=](){
+        QTimer::singleShot(300,this,[=](){
             this->close();
             ChooseWindow->show();
         });//延时进入窗口
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
         close();
     });//退出按钮按下效果实现
 
-    connect(ChooseWindow,&ChooseLevelWindow::ChooseLevelWindowBack,this,&MainWindow::show);
+    connect(ChooseWindow,&ChooseLevelWindow::ChooseLevelWindowBack,this,&MainWindow::show);//监听选择关卡场景的返回信号
 }
 
 

@@ -1,17 +1,29 @@
 <RCC>
     <qresource prefix="/">
+        <file>image/BackButton.png</file>
+        <file>image/BackButtonSelected.png</file>
         <file>image/background.jpg</file>
+        <file>image/exit.png</file>
+        <file>image/exit2.png</file>
+        <file>image/levelbutton.png</file>
+        <file>image/levelbutton2.png</file>
         <file>image/pause.png</file>
         <file>image/restart.png</file>
         <file>image/startbutton.png</file>
         <file>image/startbutton2.png</file>
-        <file>image/windowicon.jpg</file>
-        <file>image/exit.png</file>
         <file>image/title.jpg</file>
-        <file>image/exit2.png</file>
-        <file>image/BackButton.png</file>
-        <file>image/BackButtonSelected.png</file>
-        <file>image/levelbutton.png</file>
-        <file>image/one.png</file>
+        <file>image/windowicon.jpg</file>
+        <file>image/ball.png</file>
+        <file>image/platform.png</file>
+        <file>image/bluebrick.png</file>
+        <file>image/greenbrick.png</file>
+        <file>image/orangebrick.png</file>
+        <file>image/item1.png</file>
+        <file>image/item2.png</file>
+        <file>image/item3.png</file>
+        <file>image/item4.png</file>
+        <file>image/item5.png</file>
+        <file>image/item6.png</file>
+        <file>image/stickplatform.png</file>
     </qresource>
 </RCC>

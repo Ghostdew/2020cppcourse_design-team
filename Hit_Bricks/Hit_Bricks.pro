@@ -26,11 +26,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    chooselevelwindow.cpp
+    chooselevelwindow.cpp \
+    playwindow.cpp \
+    ball.cpp \
+    platform.cpp \
+    dataconfig.cpp \
+    brick.cpp \
+    item.cpp
 
 HEADERS += \
         mainwindow.h \
-    chooselevelwindow.h
+    chooselevelwindow.h \
+    playwindow.h \
+    ball.h \
+    platform.h \
+    dataconfig.h \
+    brick.h \
+    item.h
 
 FORMS += \
         mainwindow.ui \
@@ -38,3 +50,4 @@ FORMS += \
 
 RESOURCES += \
     res.qrc
+

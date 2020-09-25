@@ -2,6 +2,7 @@
 #define CHOOSELEVELWINDOW_H
 
 #include <QMainWindow>
+#include "playwindow.h"
 
 namespace Ui {
 class ChooseLevelWindow;
@@ -17,6 +18,7 @@ public:
 
 private:
     Ui::ChooseLevelWindow *ui;
+    playwindow *play = nullptr;
 
 signals:
     void ChooseLevelWindowBack();
