@@ -18,7 +18,7 @@ public:
 
 private:
     Ui::ChooseLevelWindow *ui;
-    playwindow *play = nullptr;
+    playwindow *play = nullptr;//游戏界面指针
 
 signals:
     void ChooseLevelWindowBack();

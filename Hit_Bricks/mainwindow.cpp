@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(800,550);
     setWindowIcon(QIcon(":/image/windowicon.jpg"));
     setWindowTitle("打砖块");
+    ui->helplabel->setVisible(false);
+    ui->continueButton->setVisible(false);
     ChooseWindow = new ChooseLevelWindow;//实例化关卡选择场景
     connect(ui->StartButton,&QToolButton::pressed,this,[=](){
         ui->StartButton->setStyleSheet("border-image: url(:/image/startbutton2.png);");
@@ -20,10 +22,23 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->StartButton,&QToolButton::released,this,[=](){
         ui->StartButton->setStyleSheet("border-image: url(:/image/startbutton.png);");//开始按钮按下效果实现
         QTimer::singleShot(300,this,[=](){
+            ui->helplabel->setVisible(true);
+            ui->continueButton->setVisible(true);
+        });//延时进入窗口
+    });
+
+    connect(ui->continueButton,&QToolButton::pressed,this,[=](){
+        ui->continueButton->setStyleSheet("border-image: url(:/image/continue2.png);");
+    });//继续按钮按下效果实现
+
+    connect(ui->continueButton,&QToolButton::released,this,[=](){
+        ui->continueButton->setStyleSheet("border-image: url(:/image/continue.png);");//开始按钮按下效果实现
+        QTimer::singleShot(300,this,[=](){
+            ui->helplabel->setVisible(false);
+            ui->continueButton->setVisible(false);
             this->close();
             ChooseWindow->show();
         });//延时进入窗口
-
     });
 
     connect(ui->ExitButton,&QToolButton::pressed,this,[=](){

@@ -25,5 +25,15 @@
         <file>image/item5.png</file>
         <file>image/item6.png</file>
         <file>image/stickplatform.png</file>
+        <file>image/live.png</file>
+        <file>image/greybrick.png</file>
+        <file>image/greybrick2.png</file>
+        <file>image/help.png</file>
+        <file>image/continue.png</file>
+        <file>image/continue2.png</file>
+        <file>image/greendeath.png</file>
+        <file>image/bluedeath.png</file>
+        <file>image/greydeath.png</file>
+        <file>image/orangedeath.png</file>
     </qresource>
 </RCC>

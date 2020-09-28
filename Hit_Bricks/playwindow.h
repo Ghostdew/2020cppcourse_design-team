@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QMouseEvent>
 #include <QLabel>
+#include <QLCDNumber>
 #include <time.h>
 #include "ball.h"
 #include "platform.h"
@@ -33,12 +34,15 @@ private:
     int mousepos;//鼠标实时位置
     int gameSpeed = 20;//游戏速度**************基本不变，调速还是用ball->set_speed()好
     int levelData[7][9];//关卡砖块数据数组
+    int ball_live = 2;//小球生命
+    int scoreall = 0;//得分
     bool is_move = false;//球是否已离开板的判定器
     QTimer Ball_Timer,Platform_Timer;//定时器
     Ball *ball = nullptr;//球的判定方块指针
     Platform *board = nullptr;//板的判定方块指针
     QLabel *ball_label = nullptr,*platform_label = nullptr,*item_label = nullptr;//球和板和道具的贴图指针
     Item *item1=nullptr;//道具指针，最多同时出现一个道具
+    QLCDNumber *ball_health = nullptr,*score = nullptr;//球的生命显示指针
     Brick *bricks[7][9];//砖块指针数组
 
 signals:

@@ -102,10 +102,44 @@
      <string>...</string>
     </property>
    </widget>
+   <widget class="QLabel" name="helplabel">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-40</y>
+      <width>801</width>
+      <height>591</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-image: url(:/image/help.png);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="continueButton">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>60</y>
+      <width>221</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-image: url(:/image/continue.png);</string>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
    <zorder>backgroundlabel</zorder>
    <zorder>StartButton</zorder>
    <zorder>titlelabel</zorder>
    <zorder>ExitButton</zorder>
+   <zorder>helplabel</zorder>
+   <zorder>continueButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

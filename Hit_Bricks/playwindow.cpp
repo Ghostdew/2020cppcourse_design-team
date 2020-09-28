@@ -15,10 +15,20 @@ playwindow::playwindow(int num)
     setWindowIcon(QIcon(":/image/windowicon.jpg"));
     setWindowTitle("打砖块");
 
+    ball_health = new QLCDNumber(this);
+    ball_health->display(ball_live);
+    ball_health->setFixedSize(65,42);
+    ball_health->setStyleSheet("border-image: url(:/image/live.png);");
+    ball_health->move(720,50);//小球生命值显示
+
+    score = new QLCDNumber(this);
+    score->display(0);
+    score->setFixedSize(80,30);//分数显示
+
     QToolButton *backButton = new QToolButton(this);
     backButton->setFixedSize(91,41);
     backButton->move(720,10);
-    backButton->setStyleSheet("border-image: url(:/image/BackButton.png);");
+    backButton->setStyleSheet("border-image: url(:/image/BackButton.png);");//返回按钮的设置
 
     connect(backButton,&QToolButton::pressed,this,[=](){
         backButton->setStyleSheet("border-image: url(:/image/BackButtonSelected.png);");
@@ -49,7 +59,7 @@ playwindow::playwindow(int num)
     createbrick();//创建砖块
 
     setMouseTracking(true);//设置鼠标追踪
-    Platform_Timer.start(gameSpeed);//启动初始定时器
+    Platform_Timer.start(10);//启动初始定时器
 
     connect(&Ball_Timer,&QTimer::timeout,this,[=](){
        platform_label->move(mousepos-platform_label->width()/2,500);//捕捉鼠标移动label平台
@@ -74,13 +84,15 @@ playwindow::playwindow(int num)
         if(!board->is_stick)
         {
             ball->set_ball(QRectF(mousepos-ball->get_radius(),ball->get_top(),ball->get_radius()*2,ball->get_radius()*2));//捕捉鼠标的移动来移动小球判定框
+            ball_label->move((int)ball->get_Pointx(),(int)ball->get_Pointy());//小球贴图随判定区移动
         }else
         {
-            ball->set_ball(QRectF(mousepos+delta,ball->get_top(),(ball->get_radius()-3)*2,(ball->get_radius()-3)*2));//捕捉鼠标的移动来移动小球判定框
+            ball->set_ball(QRectF(mousepos+delta,ball->get_top(),(ball->get_radius())*2,(ball->get_radius())*2));//捕捉鼠标的移动来移动小球判定框
+            ball_label->move((int)ball->get_Pointx(),(int)ball->get_Pointy()+5);//小球贴图随判定区移动
         }
 
         collision();//碰撞函数，为了道具的正常掉落及拾取
-        ball_label->move((int)ball->get_Pointx(),(int)ball->get_Pointy());//小球贴图随判定区移动
+        ball_label->move((int)ball->get_Pointx(),(int)ball->get_Pointy()+10);//小球贴图随判定区移动
         if(item1!=nullptr)
         {
             if(!item1->is_hit)
@@ -106,7 +118,7 @@ void playwindow::createball()//小球初始化
 {
     ball = new Ball(board->get_height(),0,board->get_top()-board->get_height());//球的直径是板的高度，球的位置也由板的位置确定
     ball_label = new QLabel(this);//球贴图的创建
-    ball_label->setFixedSize(ball->get_radius()*2-3,ball->get_radius()*2-3);//根据矩形类小球的大小来设置label小球的大小
+    ball_label->setFixedSize(ball->get_radius()*2,ball->get_radius()*2);//根据矩形类小球的大小来设置label小球的大小
     ball_label->setStyleSheet("border-image: url(:/image/ball.png);");
 }
 
@@ -120,7 +132,7 @@ void playwindow::createplatform()//平台初始化
     board = new Platform(340,500,platform_label->width(),platform_label->height());//根据label平台的大小设置矩形类平台的大小
 }
 
-void playwindow::createbrick()//砖块初始化
+void playwindow::createbrick()//根据关卡设计初始化砖块
 {
     for(int i=0;i<7;i++)
     {
@@ -132,20 +144,33 @@ void playwindow::createbrick()//砖块初始化
             }else
             {
                 QLabel *tlabel = new QLabel(this);
+                int brick_live,id;
                 switch(levelData[i][j]){
                     case 1:
                         tlabel->setStyleSheet("border-image: url(:/image/bluebrick.png);");
+                        brick_live = 1;
+                        id = 1 ;
                         break;
                     case 2:
                         tlabel->setStyleSheet("border-image: url(:/image/greenbrick.png);");
+                        brick_live = 1;
+                        id = 2;
                         break;
                     case 3:
                         tlabel->setStyleSheet("border-image: url(:/image/orangebrick.png);");
+                        brick_live = 1;
+                        id = 3;
+                        break;
+                    case 4:
+                        tlabel->setStyleSheet("border-image: url(:/image/greybrick.png);");
+                        brick_live = 2;
+                        id = 4;
                         break;
                 }
                 tlabel->setFixedSize(55,23);
                 tlabel->move(120+62*j,90+30*i);
-                bricks[i][j] = new Brick(120+62*j,90+30*i,tlabel->width(),tlabel->height(),tlabel);
+                bricks[i][j] = new Brick(120+62*j,90+30*i,tlabel->width(),tlabel->height(),tlabel,brick_live,id);
+
             }
         }
     }
@@ -155,11 +180,11 @@ void playwindow::collision()//碰撞
 {
     if(ball->get_bottom()<520)
     {
-        if(ball->get_top()<=0)
+        if(ball->get_top()<0)
         {
             ball->set_angel(180-ball->get_angel());
         }
-        else if(ball->get_left()<=0||ball->get_right()>=800)
+        else if(ball->get_left()<0||ball->get_right()>800)
         {
             ball->set_angel(-ball->get_angel());
         }
@@ -178,11 +203,30 @@ void playwindow::collision()//碰撞
             }
 
         }
+    }else if(ball->get_bottom()>540)//小球掉落，生命值减少
+    {
+        ball_live--;
+        if(ball_live==-1)
+        {
+            QTimer::singleShot(300,this,[=](){
+                this->hide();
+                emit playwindowBack();
+            });
+        }
+        if(ball_live>=0)
+        {
+            ball_health->display(ball_live);
+            ball->set_ball(QRectF(mousepos-ball->get_radius(),board->get_top()-board->get_height(),ball->get_radius()*2,ball->get_radius()*2));//捕捉鼠标的移动来移动矩形类            
+            Ball_Timer.stop();
+            ball->set_angel(0);
+            delta = -ball->get_radius();
+            Platform_Timer.start(gameSpeed);
+        }
     }
 
     //*************************************
     //*******小球与砖块碰撞******************
-    bool is_hit=false;//判定一次碰撞只能消灭一个小球
+    bool is_hit=false;//判定调用一次碰撞函数只能消灭一个小球
     for(int i=0;i<7;i++)
     {
         for(int j=0;j<9;j++)
@@ -191,67 +235,108 @@ void playwindow::collision()//碰撞
             {
                 is_hit = true;
 
-                int RAND = rand()%1000+1;
+                scoreall+=40;
+                score->display(scoreall);
 
-                if((item1!=nullptr&&item1->is_hit)||(item1==nullptr))//随机掉落道具
-                {
+                int RAND = rand()%5000+1;
 
-                    if(RAND>0&&RAND<=100)
-                    {
-                        QLabel *ilabel = new QLabel(this);
-                        ilabel->setStyleSheet("border-image: url(:/image/item1.png);");
-                        ilabel->setVisible(true);
-                        ilabel->setFixedSize(21,27);
-                        ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
-                        item_label = ilabel;
-                        item1 = new Item(1,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
-                    }
-
-                    if(RAND>100&&RAND<=200)
-                    {
-                        QLabel *ilabel = new QLabel(this);
-                        ilabel->setStyleSheet("border-image: url(:/image/item2.png);");
-                        ilabel->setVisible(true);
-                        ilabel->setFixedSize(21,27);
-                        ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
-                        item_label = ilabel;
-                        item1 = new Item(2,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
-                    }
-                    if(RAND>200&&RAND<=300)
-                    {
-                        QLabel *ilabel = new QLabel(this);
-                        ilabel->setStyleSheet("border-image: url(:/image/item3.png);");
-                        ilabel->setVisible(true);
-                        ilabel->setFixedSize(21,27);
-                        ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
-                        item_label = ilabel;
-                        item1 = new Item(3,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
-                    }
-                    if(RAND>300&&RAND<=400)
-                    {
-                        QLabel *ilabel = new QLabel(this);
-                        ilabel->setStyleSheet("border-image: url(:/image/item4.png);");
-                        ilabel->setVisible(true);
-                        ilabel->setFixedSize(21,27);
-                        ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
-                        item_label = ilabel;
-                        item1 = new Item(4,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
-                    }
-                    if(RAND>400&&RAND<=500)
-                    {
-                        QLabel *ilabel = new QLabel(this);
-                        ilabel->setStyleSheet("border-image: url(:/image/item5.png);");
-                        ilabel->setVisible(true);
-                        ilabel->setFixedSize(21,27);
-                        ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
-                        item_label = ilabel;
-                        item1 = new Item(5,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
-                    }
-
-                }
 
                 bricks[i][j]->set_health(bricks[i][j]->get_health()-1);
-                bricks[i][j]->get_label()->setVisible(false);
+                if(bricks[i][j]->get_health()==0)
+                {
+                    if((item1!=nullptr&&item1->is_hit)||(item1==nullptr))//随机掉落道具
+                    {
+
+                        if(RAND>0&&RAND<=100)
+                        {
+                            QLabel *ilabel = new QLabel(this);
+                            ilabel->setStyleSheet("border-image: url(:/image/item1.png);");
+                            ilabel->setVisible(true);
+                            ilabel->setFixedSize(21,27);
+                            ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
+                            item_label = ilabel;
+                            item1 = new Item(1,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
+                        }
+
+                        if(RAND>100&&RAND<=200)
+                        {
+                            QLabel *ilabel = new QLabel(this);
+                            ilabel->setStyleSheet("border-image: url(:/image/item2.png);");
+                            ilabel->setVisible(true);
+                            ilabel->setFixedSize(21,27);
+                            ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
+                            item_label = ilabel;
+                            item1 = new Item(2,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
+                        }
+                        if(RAND>200&&RAND<=300)
+                        {
+                            QLabel *ilabel = new QLabel(this);
+                            ilabel->setStyleSheet("border-image: url(:/image/item3.png);");
+                            ilabel->setVisible(true);
+                            ilabel->setFixedSize(21,27);
+                            ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
+                            item_label = ilabel;
+                            item1 = new Item(3,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
+                        }
+                        if(RAND>300&&RAND<=400)
+                        {
+                            QLabel *ilabel = new QLabel(this);
+                            ilabel->setStyleSheet("border-image: url(:/image/item4.png);");
+                            ilabel->setVisible(true);
+                            ilabel->setFixedSize(21,27);
+                            ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
+                            item_label = ilabel;
+                            item1 = new Item(4,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
+                        }
+                        if(RAND>400&&RAND<=500)
+                        {
+                            QLabel *ilabel = new QLabel(this);
+                            ilabel->setStyleSheet("border-image: url(:/image/item5.png);");
+                            ilabel->setVisible(true);
+                            ilabel->setFixedSize(21,27);
+                            ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
+                            item_label = ilabel;
+                            item1 = new Item(5,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
+                        }
+                        if(RAND>500&&RAND<=600)
+                        {
+                            QLabel *ilabel = new QLabel(this);
+                            ilabel->setStyleSheet("border-image: url(:/image/item6.png);");
+                            ilabel->setVisible(true);
+                            ilabel->setFixedSize(21,27);
+                            ilabel->move(bricks[i][j]->get_left(),bricks[i][j]->get_top());
+                            item_label = ilabel;
+                            item1 = new Item(6,bricks[i][j]->get_left(),bricks[i][j]->get_top(),ilabel->width(),ilabel->height());
+                        }
+
+                    }
+                    switch(bricks[i][j]->get_id())
+                    {
+                        case 1:
+                            bricks[i][j]->get_label()->setStyleSheet("border-image: url(:/image/bluedeath.png);");
+                            break;
+                        case 2:
+                            bricks[i][j]->get_label()->setStyleSheet("border-image: url(:/image/greendeath.png);");
+                            break;
+                        case 3:
+                            bricks[i][j]->get_label()->setStyleSheet("border-image: url(:/image/orangedeath.png);");
+                            break;
+                        case 4:
+                            bricks[i][j]->get_label()->setStyleSheet("border-image: url(:/image/greydeath.png);");
+                            break;
+                    }
+
+                    QTimer::singleShot(100,this,[=](){
+                       bricks[i][j]->get_label()->setVisible(false);
+                    });
+
+                }else
+                {
+                    bricks[i][j]->get_label()->setStyleSheet("border-image: url(:/image/greybrick2.png);");
+                    QTimer::singleShot(100,this,[=](){
+                        bricks[i][j]->get_label()->setStyleSheet("border-image: url(:/image/greybrick.png);");
+                    });
+                }
                 if(ball->get_left()<bricks[i][j]->get_right()&&ball->get_right()>bricks[i][j]->get_left()&&ball->get_top()>bricks[i][j]->get_top())
                 {
                     ball->set_angel(180-ball->get_angel());
@@ -272,6 +357,7 @@ void playwindow::collision()//碰撞
                     ball->set_angel(-ball->get_angel());
                     //qDebug()<<"打中左边";
                 }
+
             }
             if(is_hit)
                 break;
@@ -326,6 +412,10 @@ void playwindow::collision()//碰撞
                         Ball_Timer.start(gameSpeed);
                     });
                     break;
+                 case 6:
+                    ball_live++;
+                    ball_health->display(ball_live);
+                    break;
             }
             item_label->move(10000,10000);
             item_label->setVisible(false);
@@ -341,6 +431,8 @@ void playwindow::collision()//碰撞
     }
 
 }
+
+
 
 void playwindow::mouseMoveEvent(QMouseEvent *event)//捕捉鼠标位置
 {
